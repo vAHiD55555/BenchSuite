@@ -1,3 +1,4 @@
+[![Build App](https://github.com/vAHiD55555/BenchSuite/actions/workflows/build_app.yml/badge.svg)](https://github.com/vAHiD55555/BenchSuite/actions/workflows/build_app.yml)
 ![Banner](assets/banner.webp)
 
 # BenchSuite 📊
