@@ -1,0 +1,62 @@
+name: Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Install SDK Components
+        run: |
+          sdkmanager \
+          "platform-tools" \
+          "platforms;android-35" \
+          "build-tools;35.0.0"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Grant Gradle Permission
+        run: chmod +x gradlew
+
+      - name: Build APK
+        run: ./gradlew assembleRelease
+
+      - name: Find APK
+        run: find . -name "*.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BenchSuite-APK
+          path: |
+            **/build/outputs/apk/**/*.apk
